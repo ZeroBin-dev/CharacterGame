@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="common/head.html :: headFragment"/>
+<body class="game_body">
+<div id="game-container">
+  <h1 id="title">문제 갯수 선택</h1>
+  <div id="question-selection">
+    <button class="question-button" onclick="startGame(10)">10문제</button>
+    <button class="question-button" onclick="startGame(20)">20문제</button>
+    <button class="question-button" onclick="startGame(50)">50문제</button>
+    <button class="back-to-menu" onclick="location.href='/'">다른 게임 하러 가기</button>
+  </div>
+  <div id="game" style="display: none;">
+    <h2 id="question-counter">0 / 0 / 0</h2>
+    <img id="question-image" src="" alt="캐릭터 이미지">
+    <input class="game_input" type="text" id="answer-input" placeholder="정답을 입력하세요">
+    <button class="game_button" id="submit-answer">확인</button>
+    <p id="feedback"></p>
+  </div>
+  <div id="results" style="display: none;">
+    <h2>게임 종료</h2>
+    <p id="score"></p>
+    <button class="game_button" onclick="resetGame()">처음으로 돌아가기</button>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  const questions = [[${list}]];
+  let selectedQuestions = [];
+  let currentQuestionIndex = 0;
+  let correctCount = 0;
+
+  function startGame(questionCount) {
+    selectedQuestions = questions.sort(() => 0.5 - Math.random()).slice(0, questionCount);
+    document.getElementById('question-selection').style.display = 'none';
+    document.getElementById('game').style.display = 'block';
+    document.getElementById('title').textContent = `${questionCount}문제 모드 시작!`;
+    currentQuestionIndex = 0; // 초기화
+    correctCount = 0; // 초기화
+    displayQuestion(); // 첫 질문 표시
+  }
+
+  function displayQuestion() {
+    if (currentQuestionIndex < selectedQuestions.length) {
+      const currentQuestion = selectedQuestions[currentQuestionIndex];
+      document.getElementById('question-image').src = currentQuestion.imagePath;
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('answer-input').value = ''; // 입력창 초기화
+      document.getElementById('answer-input').disabled = false; // 입력 가능
+      document.getElementById('answer-input').focus(); // 포커스 주기
+
+      // Update question counter
+      document.getElementById('question-counter').textContent =
+        `${selectedQuestions.length - currentQuestionIndex} / ${currentQuestionIndex} / ${correctCount}`;
+      document.getElementById('submit-answer').textContent = "제출"; // 버튼 텍스트 초기화
+    } else {
+      endGame(); // 문제가 없으면 게임 종료
+    }
+  }
+
+  function checkAnswer() {
+    const userAnswer = document.getElementById('answer-input').value.trim();
+    const answer = selectedQuestions[currentQuestionIndex].correctAnswer;
+
+    if (userAnswer.toLowerCase() === answer.toLowerCase()) {
+      correctCount++;
+      document.getElementById('feedback').textContent = "정답입니다!";
+      document.getElementById('feedback').className = "correct";
+    } else {
+      document.getElementById('feedback').textContent = `오답입니다! 정답은 '${answer}'입니다.`;
+      document.getElementById('feedback').className = "incorrect";
+    }
+
+    // "다음" 버튼으로 변경
+    document.getElementById('submit-answer').textContent = "다음";
+  }
+
+  // 엔터 키 이벤트 추가
+  document.getElementById('answer-input').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // 기본 동작 방지
+      checkAnswer(); // 답안 확인
+    }
+  });
+
+  // 제출 버튼 클릭 시 답안 확인
+  document.getElementById('submit-answer').addEventListener('click', function() {
+    const buttonText = document.getElementById('submit-answer').textContent;
+    if (buttonText === "제출") {
+      checkAnswer(); // 답안 확인
+    } else {
+      currentQuestionIndex++; // 문제 인덱스 증가
+      displayQuestion(); // 다음 문제 표시
+    }
+  });
+
+  // 게임 종료
+  function endGame() {
+    document.getElementById('game').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('score').textContent =
+      `총 ${selectedQuestions.length}문제 중 ${correctCount}문제를 맞추셨습니다!`;
+  }
+
+  // 게임 초기화
+  function resetGame() {
+    selectedQuestions = [];
+    currentQuestionIndex = 0;
+    correctCount = 0;
+
+    document.getElementById('question-selection').style.display = 'block';
+    document.getElementById('game').style.display = 'none';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('question-counter').textContent = "0 / 0 / 0";
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('answer-input').value = '';
+    document.getElementById('title').textContent = "캐릭터 맞추기 게임";
+  }
+</script>
+</body>
+</html>
