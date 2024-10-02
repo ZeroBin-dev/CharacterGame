@@ -1,41 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<th:block th:replace="common/head.html :: headFragment"/>
+<th:block th:replace="~{common/head.html :: headFragment}"/>
 <body class="menu_body">
 <h1>캐릭터 맞추기 게임</h1>
 <div id="menu-container">
   <div class="menu-item" th:each="menu : ${list}">
-    <div class="menu-img"></div>
+    <img class="menu-img" th:src="${menu.menuImg}" th:alt="${menu.title}" />
+    <div class="menu-title" th:text="${menu.title}"></div>
+    <a class="start-btn" th:href="@{'/start-game/'+${menu.menuId}}" th:text="${'시작하기'}"></a>
   </div>
 </div>
-<script th:inline="javascript">
-  const menus = [[${list}]];
-  const menuContainer = document.getElementById('menu-container');
-
-  menus.forEach(menu => {
-    const menuItem = document.createElement('div');
-    menuItem.classList.add('menu-item');
-
-    const menuImg = document.createElement('img');
-    menuImg.src = menu.menuImg;
-    menuImg.alt = menu.title;
-    menuImg.classList.add('menu-img');
-
-    const menuTitle = document.createElement('div');
-    menuTitle.textContent = menu.title;
-    menuTitle.classList.add('menu-title');
-
-    const startBtn = document.createElement('a');
-    startBtn.href = `/start-game/${menu.menuId}`;
-    startBtn.textContent = '시작하기';
-    startBtn.classList.add('start-btn');
-
-    menuItem.appendChild(menuImg);
-    menuItem.appendChild(menuTitle);
-    menuItem.appendChild(startBtn);
-
-    menuContainer.appendChild(menuItem);
-  });
-</script>
 </body>
 </html>

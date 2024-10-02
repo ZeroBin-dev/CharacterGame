@@ -12,6 +12,14 @@
     order by created_at asc
   </select>
 
+  <select id="selectMenuOne" parameterType="String" resultType="com.cha.charactergame.model.MenuInfo">
+    select menu_id,
+           title,
+           menu_img
+    from character_menus
+    where menu_id = #{menuId}
+  </select>
+
   <select id="selectQuestionList" parameterType="String" resultType="com.cha.charactergame.model.QuestionInfo">
     select question_id,
            menu_id,
@@ -19,6 +27,30 @@
            correct_answer
     from character_questions
     where menu_id = #{menuId}
+  </select>
+
+  <insert id="insertRanking" parameterType="com.cha.charactergame.model.RankingInfo">
+    INSERT INTO (
+      player_name,
+      score,
+      play_time,
+      menu_id
+    ) VALUES (
+      #{playerName},
+      #{score},
+      #{playTime},
+      #{menuId}
+    )
+  </insert>
+
+  <select id="selectRankList" resultType="com.cha.charactergame.model.RankingInfo">
+    select play_name,
+           score,
+           play_time,
+           menu_id,
+           DATE_FORMAT(play_date, '%Y-%m-%d %T') as play_date
+    from game_rankings
+    order by created_at asc
   </select>
 
 </mapper>

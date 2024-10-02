@@ -106,19 +106,3 @@ body {
 #results {
     margin-top: 20px;
 }
-
-.back-to-menu {
-    padding: 10px 20px;
-    margin: 20px;
-    background-color: #FF5722; /* 버튼 색상 */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-}
-
-.back-to-menu:hover {
-    background-color: #c62828; /* 마우스 오버 색상 */
-}

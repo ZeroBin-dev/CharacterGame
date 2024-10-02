@@ -67,3 +67,15 @@ function goBack(){
   window.history.back();
 }
 
+function imgZoomIn(e) {
+  var modal = document.getElementById("imageModalMed");
+  var modalImg = document.getElementById("modalImageMed");
+  var close = document.getElementsByClassName("close-med")[0];
+
+  modal.style.display = "flex";
+  modalImg.src = e.target.src;
+
+  close.onclick = function () {
+    modal.style.display = "none";
+  }
+}

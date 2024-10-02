@@ -19,9 +19,17 @@ public class ViewController {
     return "index";
   }
 
+  @GetMapping("/study/{menuId}")
+  public String study(@PathVariable String menuId, Model model) throws Exception{
+    model.addAttribute("list", questionService.getQuestionList(menuId));
+    model.addAttribute("info", questionService.getMenuInfo(menuId));
+    return "view/study";
+  }
+
   @GetMapping("/start-game/{menuId}")
   public String game(@PathVariable String menuId, Model model) throws Exception {
     model.addAttribute("list", questionService.getQuestionList(menuId));
+    model.addAttribute("info", questionService.getMenuInfo(menuId));
     return "view/game";
   }
 
