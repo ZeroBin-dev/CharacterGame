@@ -1,0 +1,63 @@
+#question-selection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.menu-img {
+    width: 100%;
+    height: 200px; /* 높이는 그대로 유지 */
+    object-fit: contain; /* 이미지를 가로와 세로 비율을 유지하며 축소 또는 확대하여 컨테이너 안에 맞춤 */
+    background-color: #f0f0f0; /* 이미지가 비어있는 부분을 감싸줄 배경색 설정 */
+}
+
+.mode-section {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.section-divider {
+    width: 80%;
+    border: 0;
+    height: 1px;
+    background-color: #ccc;
+    margin: 30px 0;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.question-button, .death-match-button, .blue-button, .red-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.question-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.death-match-button {
+    background-color: #f44336;
+    color: white;
+}
+
+.blue-button {
+    background-color: #2196F3;
+    color: white;
+}
+
+.red-button {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.other-game-section {
+    margin-top: 20px;
+}

@@ -54,13 +54,11 @@ function closeModal() {
 }
 
 function onApiError(err) {
-  closeModal();
-  alert(err.responseJSON.exception.errorMessage);
+  alert('오류');
 }
 
-function onApiSuccess(data) {
-  closeModal();
-  alert(data.msg);
+function onApiSuccess(data){
+  alert('처리완료');
 }
 
 function goBack(){

@@ -1,13 +1,23 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <th:block th:replace="~{common/head.html :: headFragment}"/>
-<body class="menu_body">
-<h1 th:text="${info.title} + ' 공부하기'"></h1>
-<div id="menu-container">
-  <div class="menu-item" th:each="menu : ${list}">
-    <img class="menu-img" onclick="imgZoomIn(event)" th:src="${menu.imagePath}" alt="캐릭터 이미지"/>
-    <div class="menu-title" th:text="${menu.correctAnswer}"></div>
+<head>
+  <link th:href="@{/css/index.css}" rel="stylesheet"/>
+</head>
+<body>
+<header>
+  <h2 th:text="${info.title} + ' 공부하기'"></h2>
+</header>
+<main>
+  <div id="menu-container">
+    <div class="menu-item" th:each="menu : ${list}">
+      <img class="menu-img" onclick="imgZoomIn(event)" th:src="${menu.imagePath}" alt="캐릭터 이미지"/>
+      <div class="menu-title" th:text="${menu.correctAnswer}"></div>
+    </div>
   </div>
-</div>
+</main>
+<footer>
+  <button class="red-button" onclick="location.href='/'">다른 게임 하러 가기</button>
+</footer>
 </body>
 </html>

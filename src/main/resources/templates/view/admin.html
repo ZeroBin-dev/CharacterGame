@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<th:block th:replace="~{common/head.html :: headFragment}"/>
+<head>
+  <link th:href="@{/css/admin.css}" rel="stylesheet"/>
+</head>
+<body>
+<header>
+  <h2>어드민 페이지</h2>
+</header>
+<main>
+  <div>
+    <h3>문제 등록</h3>
+    <label for="menuId">메뉴 ID:</label>
+    <select id="menuId" name="menuId">
+      <option value="">메뉴 선택</option>
+      <th:block th:each="menu : ${menuList}">
+        <option th:value="${menu.menuId}" th:text="${menu.title}"></option>
+      </th:block>
+    </select>
+    <br>
+    <label for="imagePath">사진 경로:</label>
+    <input type="text" id="imagePath" required>
+    <br>
+    <label for="correctAnswer">정답:</label>
+    <input type="text" id="correctAnswer" required>
+    <br>
+    <button onclick="registQ()">등록하기</button>
+  </div>
+  <hr/>
+  <div>
+    <h3>문제 삭제</h3>
+    <label for="qId">문제ID : </label>
+    <input type="text" id="qId" required>
+    <br>
+    <button onclick="deleteQ()">삭제하기</button>
+  </div>
+  <hr/>
+  <div>
+    <h3>메뉴 등록</h3>
+    <label for="imagePath">메뉴 사진 경로:</label>
+    <input type="text" id="menuImagePath" required>
+    <br>
+    <label for="correctAnswer">메뉴명:</label>
+    <input type="text" id="menuName"  required>
+    <br>
+    <button onclick="registMenu()">등록하기</button>
+  </div>
+  <hr/>
+  <div>
+    <h3>메뉴 삭제</h3>
+    <label for="mId">메뉴ID : </label>
+    <input type="text" id="mId" required>
+    <br>
+    <button onclick="deleteM()">삭제하기</button>
+  </div>
+</main>
+<footer>
+  <button onclick="location.href='/'">게임 하러 가기</button>
+</footer>
+
+<script th:inline="javascript">
+
+  function registQ() {
+    let data = {
+      menuId: document.getElementById('menuId').value,
+      correctAnswer: document.getElementById('correctAnswer').value,
+      imagePath: document.getElementById('imagePath').value
+    }
+
+    postApi('/admin/answer', data, onApiSuccess, onApiError);
+  }
+
+  function deleteQ(){
+    let data = {
+      questionId: document.getElementById('qId').value
+    }
+
+    postApi('/admin/answer/delete', data, onApiSuccess, onApiError);
+  }
+
+  function registMenu() {
+    let data = {
+      title: document.getElementById('menuName').value,
+      menuImg: document.getElementById('menuImagePath').value
+    }
+
+    postApi('/admin/menu', data, onApiSuccess, onApiError);
+  }
+
+  function deleteM(){
+    let data = {
+      menuId: document.getElementById('mId').value
+    }
+
+    postApi('/admin/menu/delete', data, onApiSuccess, onApiError);
+  }
+
+
+
+</script>
+</body>
+</html>

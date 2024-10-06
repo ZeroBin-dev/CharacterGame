@@ -50,8 +50,10 @@ body {
 
 #question-image {
     width: 100%; /* 부모 요소에 맞게 크기 조정 */
-    height: auto; /* 비율 유지 */
+    height: 400px; /* 비율 유지 */
     margin: 20px 0;
+    object-fit: contain; /* 이미지를 가로와 세로 비율을 유지하며 축소 또는 확대하여 컨테이너 안에 맞춤 */
+    background-color: #f0f0f0; /* 이미지가 비어있는 부분을 감싸줄 배경색 설정 */
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{common/head.html :: headFragment}"/>
+<head>
+  <link th:href="@{/css/gameIndex.css}" rel="stylesheet"/>
+</head>
+<body>
+<header>
+  <h2 th:text="${info.title}"></h2>
+</header>
+<main>
+  <div id="game-container">
+    <!-- 모드선택 선택 -->
+    <div id="question-selection">
+      <img class="menu-img" th:src="${info.menuImg}" th:alt="${info.title}"/>
+      <hr class="section-divider"/>
+      <!-- 일반 모드 -->
+      <div class="mode-section">
+        <h3>일반 모드</h3>
+        <div class="button-group">
+          <button class="question-button"
+                  th:onclick="'location.href=\'/start-game/' + @{${info.menuId}} + '/normal10\''">10문제
+          </button>
+          <button class="question-button"
+                  th:onclick="'location.href=\'/start-game/' + @{${info.menuId}} + '/normal20\''">20문제
+          </button>
+          <button class="question-button"
+                  th:onclick="'location.href=\'/start-game/' + @{${info.menuId}} + '/normal50\''">50문제
+          </button>
+        </div>
+      </div>
+
+      <hr class="section-divider"/>
+
+      <!-- 데스매치 모드 -->
+      <div class="mode-section">
+        <h3>데스매치 모드</h3>
+        <p style="color: red; font-size: 14px;">※ 데스매치 모드는 20문제 랜덤 출제, 한 문제당 20초 제한, 3개 이상 오답 시 게임 종료됩니다.</p>
+        <button class="question-button death-match-button"
+                th:onclick="'location.href=\'/start-game/' + @{${info.menuId}} + '/death\''">데스매치 모드 시작
+        </button>
+      </div>
+
+      <hr class="section-divider"/>
+
+      <!-- 공부하기 -->
+      <div class="mode-section">
+        <h3>공부하기</h3>
+        <button class="blue-button" th:onclick="'location.href=\'/study/' + @{${info.menuId}} + '\''">공부하기</button>
+      </div>
+    </div>
+  </div>
+</main>
+<footer>
+  <button class="red-button" onclick="location.href='/'">다른 게임 하러 가기</button>
+</footer>
+</body>
+</html>

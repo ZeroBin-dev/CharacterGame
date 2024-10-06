@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{common/head.html :: headFragment}"/>
+<head>
+  <link th:href="@{/css/ranking.css}" rel="stylesheet"/>
+</head>
+<body>
+<header>
+  <h2>캐릭터 맞추기 게임 랭킹</h2>
+</header>
+<main>
+  <div class="tabs">
+    <div class="tab active" onclick="showRanking(''); setActiveTab(this);">전체 순위</div>
+    <div class="tab" th:each="menu : ${menuList}"
+         th:onclick="showRanking([[${menu.menuId}]]); setActiveTab(this);"
+         th:text="${menu.title}"></div>
+  </div>
+  <div id="ranking-content">
+    <h2 id="ranking-title">전체 순위</h2>
+    <table class="ranking-table">
+      <thead>
+      <tr>
+        <th>순위</th>
+        <th>이름</th>
+        <th>타이틀</th>
+        <th>스코어</th>
+        <th>날짜</th>
+      </tr>
+      </thead>
+      <tbody id="ranking-table">
+
+      </tbody>
+    </table>
+  </div>
+</main>
+<footer>
+  <button class="red-button" onclick="location.href='/'">게임 하러 가기</button>
+</footer>
+
+<script th:inline="javascript">
+  window.onload = function () {
+    showRanking('');
+  };
+
+  // 탭 활성화 관리 함수
+  function setActiveTab(selectedTab) {
+    // 모든 탭에서 active 클래스 제거
+    let tabs = document.querySelectorAll('.tab');
+    tabs.forEach(function (tab) {
+      tab.classList.remove('active');
+    });
+
+    // 클릭된 탭에만 active 클래스 추가
+    selectedTab.classList.add('active');
+  }
+
+  function showRanking(type) {
+
+    let data = {
+      menuId: type
+    }
+    // API 호출
+    postApi('/select/rank', data, onSuccessRanking, onApiError);
+  }
+
+  function onSuccessRanking(data) {
+    let list = data.list;
+    let str = '';
+
+    // 리스트를 순회하며 테이블 행 생성
+    list.forEach(function (ranking, index) {
+      str += '<tr>';
+      str += '<td>' + (index + 1) + '</td>'; // 순위 번호
+      str += '<td>' + ranking.playerName + '</td>'; // 플레이어 이름
+      str += '<td>' + ranking.title + '</td>'; // 플레이어 이름
+      str += '<td>' + ranking.score + '</td>'; // 스코어
+      str += '<td>' + ranking.playDate + '</td>'; // 플레이 날짜
+      str += '</tr>';
+    });
+
+    // 테이블에 생성된 행들을 삽입
+    document.getElementById("ranking-table").innerHTML = str;
+  }
+
+</script>
+
+</body>
+</html>

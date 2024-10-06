@@ -29,28 +29,87 @@
     where menu_id = #{menuId}
   </select>
 
+  <select id="selectRandomQuestionList" parameterType="map" resultType="com.cha.charactergame.model.QuestionInfo">
+    select question_id,
+           menu_id,
+           image_path,
+           correct_answer
+    from character_questions
+    where menu_id = #{menuId}
+    order by rand()
+      limit #{count}
+  </select>
+
   <insert id="insertRanking" parameterType="com.cha.charactergame.model.RankingInfo">
-    INSERT INTO (
+    INSERT INTO game_rankings (
       player_name,
       score,
-      play_time,
       menu_id
     ) VALUES (
       #{playerName},
       #{score},
-      #{playTime},
       #{menuId}
     )
   </insert>
 
-  <select id="selectRankList" resultType="com.cha.charactergame.model.RankingInfo">
-    select play_name,
-           score,
-           play_time,
-           menu_id,
-           DATE_FORMAT(play_date, '%Y-%m-%d %T') as play_date
-    from game_rankings
-    order by created_at asc
+  <select id="selectRankList" parameterType="String" resultType="com.cha.charactergame.model.RankingInfo">
+    SELECT
+    ga.player_name,
+    ga.score,
+    ga.menu_id,
+    DATE_FORMAT(ga.play_date, '%Y-%m-%d %T') AS play_date,
+    cm.title
+    FROM game_rankings ga left join character_menus cm
+    on ga.menu_id = cm.menu_id
+    <where>
+      <if test="menuId != null and menuId != ''">
+        ga.menu_id = #{menuId}
+      </if>
+    </where>
+    ORDER BY ga.score DESC, ga.play_date ASC LIMIT 20
   </select>
+
+  <insert id="insertQuestion" parameterType="com.cha.charactergame.controller.dto.AdminAnswerRequest">
+    INSERT INTO character_questions(
+            question_id,
+            menu_id,
+            image_path,
+            correct_answer
+    ) VALUES (
+            #{questionId},
+            #{menuId},
+            #{imagePath},
+            #{correctAnswer})
+  </insert>
+
+  <select id="selectMaxQuestionId" resultType="String">
+    SELECT MAX(question_id) AS max_id FROM character_questions
+  </select>
+
+  <select id="selectMaxMenuId" resultType="String">
+    select MAX(menu_id) AS max_id from character_menus
+  </select>
+
+  <insert id="insertMenu" parameterType="com.cha.charactergame.controller.dto.AdminMenuRequest">
+    INSERT INTO character_menus(menu_id,
+                                title,
+                                menu_img)
+    VALUES (#{menuId},
+            #{title},
+            #{menuImg})
+  </insert>
+
+  <delete id="deleteQuestionId" parameterType="String">
+    delete from character_questions where question_id = #{qId}
+  </delete>
+
+  <delete id="deleteMenuId" parameterType="String">
+    delete from character_menus where menu_id = #{menuId}
+  </delete>
+
+  <delete id="deleteQuestionMenuId" parameterType="String">
+    delete from character_questions where menu_id = #{menuId}
+  </delete>
+
 
 </mapper>

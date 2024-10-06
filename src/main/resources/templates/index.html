@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <th:block th:replace="~{common/head.html :: headFragment}"/>
-<body class="menu_body">
-<h1>캐릭터 맞추기 게임</h1>
-<div id="menu-container">
-  <div class="menu-item" th:each="menu : ${list}">
-    <img class="menu-img" th:src="${menu.menuImg}" th:alt="${menu.title}" />
-    <div class="menu-title" th:text="${menu.title}"></div>
-    <a class="start-btn" th:href="@{'/start-game/'+${menu.menuId}}" th:text="${'시작하기'}"></a>
+<head>
+  <link th:href="@{/css/index.css}" rel="stylesheet"/>
+</head>
+<body>
+<header>
+  <h2>캐릭터 맞추기 게임</h2>
+</header>
+<main>
+  <div id="menu-container">
+    <div class="menu-item" th:each="menu : ${list}">
+      <img class="menu-img" th:src="${menu.menuImg}" th:alt="${menu.title}"/>
+      <div class="menu-title" th:text="${menu.title}"></div>
+      <a class="start-btn" th:href="@{'/start-game/'+${menu.menuId}}" th:text="${'시작하기'}"></a>
+    </div>
   </div>
-</div>
+</main>
+<footer>
+  <button class="red-button" onclick="location.href='/ranking'">랭킹보기</button>
+</footer>
 </body>
 </html>

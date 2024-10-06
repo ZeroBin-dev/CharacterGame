@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lagn="ko" xmlns:th="http://www.thymeleaf.org">
-
 <th:block th:fragment="headFragment">
-
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
@@ -10,8 +8,8 @@
 
     <!-- Link -->
     <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}">
-    <link th:href="@{/css/styles.css}" rel="stylesheet"/>
     <link rel="icon" th:href="@{/favicon.ico}" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
 
     <!-- script -->
     <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
@@ -21,6 +19,7 @@
     <title>캐릭터 맟히기 게임</title>
   </head>
 
+  <!-- 이미지 줌인 모달 -->
   <div id="imageModalMed" class="image-modal hide">
     <span class="image-close close-med">&times;</span>
     <img class="image-modal-content-med" id="modalImageMed">

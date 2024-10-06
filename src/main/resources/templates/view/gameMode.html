@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{common/head.html :: headFragment}"/>
+<head>
+  <link th:href="@{/css/gameMode.css}" rel="stylesheet"/>
+</head>
+<body>
+<header>
+  <h2 th:text="${info.title}"></h2>
+</header>
+<main>
+  <div id="game-container">
+    <h3 th:text="${isDeathMatch ? '데스모드' : '일반'} + ' [' + ${questionCount} + '문제]'"></h3>
+
+    <!-- 데스매치 -->
+    <th:block th:if="${isDeathMatch}">
+      <div id="death-game" class="game">
+        <h2 id="question-counter" th:text="'[1/' + ${questionCount} + ']'"></h2>
+        <img id="question-image" src="" alt="캐릭터 이미지" onclick="imgZoomIn(event)">
+        <p id="lives" style="font-size: 20px;"></p>
+        <p style="color: gray; font-size: 14px;">※ 띄어쓰기는 없습니다.</p>
+        <input class="game_input" type="text" id="answer-input" placeholder="정답을 입력하세요" autocomplete="off"
+               onkeydown="handleKeyDown(event)">
+        <button class="game_button" onclick="checkAnswer()" id="submit-answer">확인</button>
+        <p id="feedback"></p>
+        <p id="timer" style="font-size: 20px;"></p>
+      </div>
+    </th:block>
+
+    <!-- 일반모드 -->
+    <th:block th:unless="${isDeathMatch}">
+      <div id="normal-game">
+        <h2 id="question-counter" th:text="'[1/' + ${questionCount} + ']'"></h2>
+        <img id="question-image" src="" alt="캐릭터 이미지" onclick="imgZoomIn(event)">
+        <p style="color: gray; font-size: 14px;">※ 띄어쓰기는 없습니다.</p>
+        <input class="game_input" type="text" id="answer-input" placeholder="정답을 입력하세요" autocomplete="off"
+               onkeydown="handleKeyDown(event)">
+        <button class="game_button" onclick="checkAnswer()" id="submit-answer">확인</button>
+        <p id="feedback"></p>
+      </div>
+    </th:block>
+
+    <!-- 일반모드 게임 종료 -->
+    <div id="normal-result" class="hide">
+      <h2>게임 종료</h2>
+      <p id="normal-score"></p>
+      <button class="game_button" onclick="location.reload()">처음으로 돌아가기</button>
+    </div>
+
+    <!-- 데스모드 성공 -->
+    <div id="death-success" class="hide">
+      <h2>게임 성공</h2>
+      <p id="death-score"></p>
+      <label for="player-name">이름을 입력하세요:</label>
+      <input type="text" id="player-name">
+      <button onclick="enterName()">점수 제출</button>
+      <button class="game_button" onclick="location.reload()">한번더 도전하기</button>
+    </div>
+
+    <!-- 데스모드 실패 -->
+    <div id="death-fail" class="hide">
+      <h2>게임 실패</h2>
+      <p>3회 이상 틀리셨습니다.</p>
+      <button class="game_button" onclick="location.reload()">한번더 도전하기</button>
+    </div>
+
+  </div>
+</main>
+<footer>
+  <button class="red-button" onclick="location.href='/'">다른 게임 하러 가기</button>
+</footer>
+<script th:inline="javascript">
+  let questionCount = [[${questionCount}]]; // 문제수
+  let info = [[${info}]];
+  let isDeathMatch = [[${isDeathMatch}]]; // 데스매치 모드 여부
+  const questions = [[${list}]]; // 문제리스트
+
+  let currentQuestionIndex = 0; // 현재문제
+  let correctCount = 0; // 맞춘문제
+  let wrongCount = 0; // 틀린문제
+  let lives = 3; // 초기 목숨 수
+  let timerInterval;
+
+  /**
+   * 초기설정
+   */
+  window.onload = function () {
+    displayQuestion();
+  };
+
+  /**
+   * 이름 입력 후 게임 시작
+   */
+  function enterName() {
+    let data = {
+      playerName: document.getElementById('player-name').value,
+      menuId: info.menuId,
+      score: correctCount
+    }
+    // API 호출
+    postApi('/insert/rank', data, onSuccessRanking, onApiError);
+  }
+
+  function onSuccessRanking() {
+    window.location.href = '/ranking';
+  }
+
+  /**
+   * 질문표시
+   */
+  function displayQuestion() {
+    document.getElementById('submit-answer').textContent = "확인";
+
+    if (currentQuestionIndex < questions.length){
+
+      // 현재 문제 출력
+      const currentQuestion = questions[currentQuestionIndex];
+      document.getElementById('question-image').src = currentQuestion.imagePath;
+      document.getElementById('answer-input').value = '';
+      document.getElementById('answer-input').focus();
+
+      // 문제 카운트 표시
+      document.getElementById('question-counter').textContent = `[${currentQuestionIndex + 1}/${questions.length}]`;
+
+      // 피드백 초기화
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('feedback').style.display = 'block';
+
+      // 데스모드
+      if (isDeathMatch) {
+        displayLives(); // 데스매치 모드일 때 하트 표시
+        startTimer(); // 타이머 시작
+      }
+    } else {
+      if(isDeathMatch){
+        successGame();
+      } else {
+        endGame();
+      }
+    }
+  }
+
+  /**
+   * 엔터기능
+   */
+  function handleKeyDown(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // 기본 엔터 동작 방지
+      checkAnswer();
+    }
+  }
+
+  /**
+   * 정답체크
+   */
+  function checkAnswer() {
+    if(document.getElementById('submit-answer').textContent === '다음'){
+      currentQuestionIndex++;
+      displayQuestion();
+      return;
+    }
+
+    const userAnswer = document.getElementById('answer-input').value.trim();
+    const answer = questions[currentQuestionIndex].correctAnswer;
+
+    clearInterval(timerInterval); // 정답 확인 후 타이머 정지
+
+    if (userAnswer.toLowerCase() === answer.toLowerCase()) {
+      correctCount++;
+      document.getElementById('feedback').textContent = "정답입니다!";
+      document.getElementById('feedback').className = "correct";
+    } else {
+      document.getElementById('feedback').textContent = `오답입니다! 정답은 '${answer}'입니다.`;
+      document.getElementById('feedback').className = "incorrect";
+      wrongCount++;
+
+      if (isDeathMatch) {
+        lives--; // 데스매치 모드일 때만 목숨 감소
+        displayLives(); // 남은 목숨 업데이트
+
+        if (lives <= 0) {
+          failGame(); // 목숨이 0이 되면 게임 종료
+          return;
+        }
+      }
+    }
+
+    // 확인버튼 비활성화 & 다음버튼 활성화
+    document.getElementById('submit-answer').textContent = "다음";
+  }
+
+  // 남은 목숨 표시 함수
+  function displayLives() {
+    const livesDisplay = document.getElementById('lives');
+    livesDisplay.textContent = `남은 목숨: ${'❤️'.repeat(lives)}`;
+  }
+
+  function startTimer() {
+    let timeLeft = 20; // 타이머 시간 설정
+
+    // 타이머가 이미 실행 중이라면 종료
+    if (timerInterval) {
+      clearInterval(timerInterval);
+    }
+
+    // 남은 시간을 즉시 화면에 표시
+    document.getElementById('timer').textContent = `남은 시간: ${timeLeft}초`;
+
+    // 새로운 타이머 시작
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval); // 타이머 정지
+        document.getElementById('feedback').textContent = "시간 초과!";
+        document.getElementById('feedback').className = "incorrect";
+        wrongCount++;
+
+        // 정답표시
+        if (isDeathMatch) {
+          displayLives(); // 남은 목숨 업데이트
+          checkAnswer();
+          if (lives <= 0) {
+            failGame(); // 목숨이 0이 되면 게임 종료
+          }
+        }
+      } else {
+        document.getElementById('timer').textContent = `남은 시간: ${timeLeft}초`;
+      }
+    }, 1000); // 1초마다 실행
+  }
+
+  /**
+   * 게임끝
+   */
+  function endGame() {
+    document.getElementById('normal-game').style.display = 'none';
+    document.getElementById('normal-result').style.display = 'block';
+    document.getElementById('normal-score').textContent = `맞힌 문제: ${correctCount} / ${questions.length}`;
+  }
+
+  /**
+   * 데스모드 실패
+   */
+  function failGame() {
+    clearInterval(timerInterval); // 타이머 정지
+    document.getElementById('death-game').style.display = 'none';
+    document.getElementById('death-fail').style.display = 'block';
+  }
+
+  /**
+   * 데스모드 성공
+   */
+  function successGame() {
+    clearInterval(timerInterval); // 타이머 정지
+    document.getElementById('death-game').style.display = 'none';
+    document.getElementById('death-success').style.display = 'block';
+  }
+
+</script>
+</body>
+</html>

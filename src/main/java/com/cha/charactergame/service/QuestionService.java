@@ -1,5 +1,7 @@
 package com.cha.charactergame.service;
 
+import com.cha.charactergame.controller.dto.BaseUpdateResponse;
+import com.cha.charactergame.controller.dto.RankingRes;
 import com.cha.charactergame.dao.QuestionDAO;
 import com.cha.charactergame.model.MenuInfo;
 import com.cha.charactergame.model.QuestionInfo;
@@ -27,13 +29,18 @@ public class QuestionService {
     return questionDAO.selectQuestionList(menuId);
   }
 
-  public void setRanking(RankingInfo rankingInfo){
-    questionDAO.insertRanking(rankingInfo);
+  public List<QuestionInfo> getRandomQuestionList(final String menuId, final int count) {
+    return questionDAO.selectRandomQuestionList(menuId, count);
   }
 
-//  public List<RankingInfo> getRankingList(){
-//    return
-//  }
+  public BaseUpdateResponse setRanking(RankingInfo rankingInfo) {
+    questionDAO.insertRanking(rankingInfo);
+    return new BaseUpdateResponse();
+  }
+
+  public RankingRes getRankingList(RankingInfo rankingInfo) {
+    return new RankingRes(questionDAO.selectRankList(rankingInfo.getMenuId()));
+  }
 
 }
 
